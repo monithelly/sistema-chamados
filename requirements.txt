@@ -4,3 +4,4 @@ plotly
 openpyxl
 gspread
 yagmail
+gspread
