@@ -42,9 +42,3 @@ def salvar_chamado(dados):
     sheet = get_sheet()
     sheet.append_row(nova_linha)
     return True
-```
-
-Depois adiciona `google-auth` e `gspread` no `requirements.txt`:
-```
-gspread
-google-auth
