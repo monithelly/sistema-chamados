@@ -56,3 +56,5 @@ def salvar_chamado(dados):
     df_final = pd.concat([df, df_novo], ignore_index=True)
 
     df_final.to_csv(CAMINHO_ARQUIVO, index=False, encoding="utf-8-sig")
+
+    return True

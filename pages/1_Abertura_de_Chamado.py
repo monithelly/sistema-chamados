@@ -12,7 +12,10 @@ st.title("Abertura de Chamado")
 st.write("Preencha as informações abaixo para abrir um chamado.")
 st.divider()
 
-with st.form("form_chamado", clear_on_submit=False):
+# Placeholder fixo para mensagens
+mensagem = st.empty()
+
+with st.form("form_chamado", clear_on_submit=True):
     solicitante = st.text_input("Solicitante")
     categoria = st.selectbox(
         "Categoria",
@@ -26,34 +29,39 @@ with st.form("form_chamado", clear_on_submit=False):
     anexo = st.file_uploader("Anexo (opcional)")
     enviar = st.form_submit_button("Abrir chamado")
 
-    if enviar:
-        if not solicitante or not orgao or not descricao:
-            st.error("Preencha pelo menos: Solicitante, Órgão e Descrição.")
-        else:
-            nome_anexo = anexo.name if anexo else ""
+if enviar:
+    if not solicitante or not orgao or not descricao:
+        mensagem.error("Preencha pelo menos: Solicitante, Órgão e Descrição.")
+    else:
+        nome_anexo = anexo.name if anexo else ""
 
-            dados = {
-                "solicitante": solicitante,
-                "categoria": categoria,
-                "orgao": orgao,
-                "login": login,
-                "url": url,
-                "link_gravacao": link_gravacao,
-                "descricao": descricao,
-                "anexo": nome_anexo
-            }
+        dados = {
+            "solicitante": solicitante,
+            "categoria": categoria,
+            "orgao": orgao,
+            "login": login,
+            "url": url,
+            "link_gravacao": link_gravacao,
+            "descricao": descricao,
+            "anexo": nome_anexo
+        }
+
+        try:
+            resultado = salvar_chamado(dados)
 
             try:
-                salvar_chamado(dados)
+                enviar_email_novo_chamado(dados)
+            except Exception:
+                pass
 
-                try:
-                    enviar_email_novo_chamado(dados)
-                except Exception as e_email:
-                    st.warning(f"E-mail não enviado: {e_email}")
+            if resultado:
+                mensagem.success("Chamado aberto com sucesso!")
+            else:
+                mensagem.error("O chamado não foi salvo.")
 
-                st.write("CHAMADO ABERTO COM SUCESSO")
-                st.success("Chamado aberto com sucesso!")
-                st.balloons()
+        except Exception as e:
+            mensagem.error(f"Erro ao salvar o chamado: {e}")
 
-            except Exception as e:
-                st.error(f"Erro ao salvar o chamado: {e}")
+            df_final.to_csv(CAMINHO_ARQUIVO, index=False, encoding="utf-8-sig")
+
+return True
