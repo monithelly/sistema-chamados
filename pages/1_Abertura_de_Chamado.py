@@ -12,18 +12,16 @@ st.title("Abertura de Chamado")
 st.write("Preencha as informações abaixo para abrir um chamado.")
 st.divider()
 
-# ✅ Inicializa o estado da mensagem
-if "mensagem" not in st.session_state:
-    st.session_state.mensagem = None
-if "mensagem_tipo" not in st.session_state:
-    st.session_state.mensagem_tipo = None
+if "sucesso" not in st.session_state:
+    st.session_state.sucesso = False
+
+if st.session_state.sucesso:
+    st.success("✅ Chamado aberto com sucesso!")
+    st.session_state.sucesso = False
 
 with st.form("form_chamado", clear_on_submit=True):
     solicitante = st.text_input("Solicitante")
-    categoria = st.selectbox(
-        "Categoria",
-        ["Bug", "Sugestão de melhoria", "Robô de fontes"]
-    )
+    categoria = st.selectbox("Categoria", ["Bug", "Sugestão de melhoria", "Robô de fontes"])
     orgao = st.text_input("Órgão")
     login = st.text_input("Login")
     url = st.text_input("URL")
@@ -34,9 +32,7 @@ with st.form("form_chamado", clear_on_submit=True):
 
 if enviar:
     if not solicitante or not orgao or not descricao:
-        # ✅ Salva o erro no session_state
-        st.session_state.mensagem = "Preencha pelo menos: Solicitante, Órgão e Descrição."
-        st.session_state.mensagem_tipo = "erro"
+        st.error("Preencha pelo menos: Solicitante, Órgão e Descrição.")
     else:
         nome_anexo = anexo.name if anexo else ""
         dados = {
@@ -49,29 +45,14 @@ if enviar:
             "descricao": descricao,
             "anexo": nome_anexo
         }
-
         try:
             resultado = salvar_chamado(dados)
             try:
                 enviar_email_novo_chamado(dados)
             except Exception:
                 pass
-
             if resultado:
-                # ✅ Salva o sucesso no session_state
-                st.session_state.mensagem = "Chamado aberto com sucesso!"
-                st.session_state.mensagem_tipo = "sucesso"
-            else:
-                st.session_state.mensagem = "O chamado não foi salvo."
-                st.session_state.mensagem_tipo = "erro"
-
+                st.session_state.sucesso = True
+                st.rerun()
         except Exception as e:
-            st.session_state.mensagem = f"Erro ao salvar o chamado: {e}"
-            st.session_state.mensagem_tipo = "erro"
-
-# ✅ Exibe a mensagem FORA do formulário, após o rerun
-if st.session_state.mensagem:
-    if st.session_state.mensagem_tipo == "sucesso":
-        st.success(st.session_state.mensagem)
-    else:
-        st.error(st.session_state.mensagem)
+            st.error(f"Erro ao salvar o chamado: {e}")
