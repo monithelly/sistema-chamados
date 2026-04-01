@@ -8,26 +8,11 @@ st.set_page_config(page_title="Abertura de Chamado", layout="centered")
 aplicar_estilo()
 mostrar_logo()
 
-if "chamado_sucesso" not in st.session_state:
-    st.session_state.chamado_sucesso = False
-
-if "chamado_erro" not in st.session_state:
-    st.session_state.chamado_erro = ""
-
 st.title("Abertura de Chamado")
 st.write("Preencha as informações abaixo para abrir um chamado.")
 st.divider()
 
-# MENSAGENS NO TOPO, FORA DO FORM
-if st.session_state.chamado_sucesso:
-    st.success("✅ Chamado aberto com sucesso!")
-    st.session_state.chamado_sucesso = False
-
-if st.session_state.chamado_erro:
-    st.error(st.session_state.chamado_erro)
-    st.session_state.chamado_erro = ""
-
-with st.form("form_chamado", clear_on_submit=True):
+with st.form("form_chamado", clear_on_submit=False):
     solicitante = st.text_input("Solicitante")
     categoria = st.selectbox(
         "Categoria",
@@ -43,33 +28,32 @@ with st.form("form_chamado", clear_on_submit=True):
 
     if enviar:
         if not solicitante or not orgao or not descricao:
-            st.session_state.chamado_erro = "Preencha pelo menos: Solicitante, Órgão e Descrição."
-            st.rerun()
+            st.error("Preencha pelo menos: Solicitante, Órgão e Descrição.")
+        else:
+            nome_anexo = anexo.name if anexo else ""
 
-        nome_anexo = anexo.name if anexo else ""
-
-        dados = {
-            "solicitante": solicitante,
-            "categoria": categoria,
-            "orgao": orgao,
-            "login": login,
-            "url": url,
-            "link_gravacao": link_gravacao,
-            "descricao": descricao,
-            "anexo": nome_anexo
-        }
-
-        try:
-            salvar_chamado(dados)
+            dados = {
+                "solicitante": solicitante,
+                "categoria": categoria,
+                "orgao": orgao,
+                "login": login,
+                "url": url,
+                "link_gravacao": link_gravacao,
+                "descricao": descricao,
+                "anexo": nome_anexo
+            }
 
             try:
-                enviar_email_novo_chamado(dados)
-            except Exception:
-                pass
+                salvar_chamado(dados)
 
-            st.session_state.chamado_sucesso = True
-            st.rerun()
+                try:
+                    enviar_email_novo_chamado(dados)
+                except Exception as e_email:
+                    st.warning(f"E-mail não enviado: {e_email}")
 
-        except Exception as e:
-            st.session_state.chamado_erro = f"Erro ao salvar o chamado: {e}"
-            st.rerun()
+                st.write("CHAMADO ABERTO COM SUCESSO")
+                st.success("Chamado aberto com sucesso!")
+                st.balloons()
+
+            except Exception as e:
+                st.error(f"Erro ao salvar o chamado: {e}")
