@@ -1,11 +1,10 @@
 import streamlit as st
 from data.salvar_chamados import salvar_chamado
-from utils.styles import aplicar_estilo, mostrar_logo
+# from utils.styles import aplicar_estilo, mostrar_logo
 
-aplicar_estilo()
-mostrar_logo()
+# aplicar_estilo()
+# mostrar_logo()
 
-# estado da mensagem
 if "chamado_salvo_ok" not in st.session_state:
     st.session_state["chamado_salvo_ok"] = False
 
@@ -13,7 +12,6 @@ st.title("Abertura de Chamado")
 st.write("Preencha as informações abaixo para abrir um chamado.")
 st.divider()
 
-# banner manual, sem depender de st.success
 if st.session_state["chamado_salvo_ok"]:
     st.markdown(
         """
