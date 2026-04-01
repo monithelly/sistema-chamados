@@ -8,25 +8,40 @@ st.set_page_config(page_title="Abertura de Chamado", layout="centered")
 aplicar_estilo()
 mostrar_logo()
 
-# Estado da mensagem
-if "mensagem_chamado" not in st.session_state:
-    st.session_state["mensagem_chamado"] = ""
+if "status_banner" not in st.session_state:
+    st.session_state.status_banner = ""
 
-if "tipo_mensagem_chamado" not in st.session_state:
-    st.session_state["tipo_mensagem_chamado"] = ""
+if "tipo_banner" not in st.session_state:
+    st.session_state.tipo_banner = ""
 
 st.title("Abertura de Chamado")
 st.write("Preencha as informações abaixo para abrir um chamado.")
 st.divider()
 
-# Exibe mensagem salva no rerun
-if st.session_state["mensagem_chamado"]:
-    if st.session_state["tipo_mensagem_chamado"] == "sucesso":
-        st.success(st.session_state["mensagem_chamado"])
-    else:
-        st.error(st.session_state["mensagem_chamado"])
+if st.session_state.status_banner:
+    cor_fundo = "#d1fae5" if st.session_state.tipo_banner == "sucesso" else "#fee2e2"
+    cor_texto = "#065f46" if st.session_state.tipo_banner == "sucesso" else "#991b1b"
+    cor_borda = "#a7f3d0" if st.session_state.tipo_banner == "sucesso" else "#fecaca"
 
-with st.form("form_chamado", clear_on_submit=True):
+    st.markdown(
+        f"""
+        <div style="
+            background-color:{cor_fundo};
+            color:{cor_texto};
+            padding:14px 16px;
+            border-radius:10px;
+            border:1px solid {cor_borda};
+            font-weight:600;
+            margin-top:16px;
+            margin-bottom:16px;
+        ">
+            {st.session_state.status_banner}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with st.form("form_chamado", clear_on_submit=False):
     solicitante = st.text_input("Solicitante")
     categoria = st.selectbox(
         "Categoria",
@@ -41,13 +56,9 @@ with st.form("form_chamado", clear_on_submit=True):
     enviar = st.form_submit_button("Abrir chamado")
 
 if enviar:
-    # limpa mensagem anterior antes de processar
-    st.session_state["mensagem_chamado"] = ""
-    st.session_state["tipo_mensagem_chamado"] = ""
-
     if not solicitante or not orgao or not descricao:
-        st.session_state["mensagem_chamado"] = "Preencha pelo menos: Solicitante, Órgão e Descrição."
-        st.session_state["tipo_mensagem_chamado"] = "erro"
+        st.session_state.status_banner = "Preencha pelo menos: Solicitante, Órgão e Descrição."
+        st.session_state.tipo_banner = "erro"
         st.rerun()
 
     nome_anexo = anexo.name if anexo else ""
@@ -72,15 +83,15 @@ if enviar:
             pass
 
         if resultado:
-            st.session_state["mensagem_chamado"] = "Chamado aberto com sucesso!"
-            st.session_state["tipo_mensagem_chamado"] = "sucesso"
+            st.session_state.status_banner = "✅ Chamado aberto com sucesso!"
+            st.session_state.tipo_banner = "sucesso"
         else:
-            st.session_state["mensagem_chamado"] = "O chamado não foi salvo."
-            st.session_state["tipo_mensagem_chamado"] = "erro"
+            st.session_state.status_banner = "O chamado não foi salvo."
+            st.session_state.tipo_banner = "erro"
 
         st.rerun()
 
     except Exception as e:
-        st.session_state["mensagem_chamado"] = f"Erro ao salvar o chamado: {e}"
-        st.session_state["tipo_mensagem_chamado"] = "erro"
+        st.session_state.status_banner = f"Erro ao salvar o chamado: {e}"
+        st.session_state.tipo_banner = "erro"
         st.rerun()
