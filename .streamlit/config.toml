@@ -4,3 +4,6 @@ backgroundColor="#F7F9FC"
 secondaryBackgroundColor="#EAF0FA"
 textColor="#132A63"
 font="sans serif"
+
+[server]
+folderWatchBlacklist = ["data"]
