@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 CAMINHO_ARQUIVO = "data/chamados.csv"
 
@@ -8,8 +9,10 @@ CAMINHO_ARQUIVO = "data/chamados.csv"
 def salvar_chamado(dados):
     os.makedirs("data", exist_ok=True)
 
+    agora_brasil = datetime.now(ZoneInfo("America/Sao_Paulo"))
+
     novo_registro = {
-        "data_abertura": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        "data_abertura": agora_brasil.strftime("%d/%m/%Y %H:%M:%S"),
         "solicitante": str(dados.get("solicitante", "")).strip(),
         "categoria": str(dados.get("categoria", "")).strip(),
         "orgao": str(dados.get("orgao", "")).strip(),

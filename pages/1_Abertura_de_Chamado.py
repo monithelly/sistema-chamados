@@ -9,12 +9,7 @@ st.title("Abertura de Chamado")
 st.write("Preencha as informações abaixo para abrir um chamado.")
 st.divider()
 
-if "msg_sucesso" not in st.session_state:
-    st.session_state["msg_sucesso"] = ""
-
-if st.session_state["msg_sucesso"]:
-    st.success(st.session_state["msg_sucesso"])
-    st.session_state["msg_sucesso"] = ""
+mensagem = st.empty()
 
 with st.form("form_chamado", clear_on_submit=True):
     solicitante = st.text_input("Solicitante")
@@ -32,7 +27,7 @@ with st.form("form_chamado", clear_on_submit=True):
 
 if enviar:
     if not solicitante or not orgao or not descricao:
-        st.error("Preencha pelo menos: Solicitante, Órgão e Descrição.")
+        mensagem.error("Preencha pelo menos: Solicitante, Órgão e Descrição.")
     else:
         nome_anexo = anexo.name if anexo else ""
 
@@ -49,7 +44,6 @@ if enviar:
 
         try:
             salvar_chamado(dados)
-            st.session_state["msg_sucesso"] = "Chamado salvo com sucesso!"
-            st.rerun()
+            mensagem.success("Chamado salvo com sucesso!")
         except Exception as e:
-            st.error(f"Erro ao salvar o chamado: {e}")
+            mensagem.error(f"Erro ao salvar o chamado: {e}")
