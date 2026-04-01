@@ -11,6 +11,7 @@ aplicar_estilo()
 mostrar_logo()
 
 st.title("Central de Chamados")
+st.caption("BUILD TESTE 2026-04-01 15:00")
 
 st.subheader("Sistema interno para abertura e acompanhamento de chamados")
 
