@@ -5,18 +5,33 @@ from utils.styles import aplicar_estilo, mostrar_logo
 aplicar_estilo()
 mostrar_logo()
 
+# estado da mensagem
+if "chamado_salvo_ok" not in st.session_state:
+    st.session_state["chamado_salvo_ok"] = False
+
 st.title("Abertura de Chamado")
 st.write("Preencha as informações abaixo para abrir um chamado.")
 st.divider()
 
-# mostra mensagem persistida da execução anterior
-if "mostrar_msg_sucesso" not in st.session_state:
-    st.session_state["mostrar_msg_sucesso"] = False
-
-if st.session_state["mostrar_msg_sucesso"]:
-    st.success("Chamado salvo com sucesso!")
-    st.toast("Chamado salvo com sucesso! ✅")
-    st.session_state["mostrar_msg_sucesso"] = False
+# banner manual, sem depender de st.success
+if st.session_state["chamado_salvo_ok"]:
+    st.markdown(
+        """
+        <div style="
+            background-color:#d1fae5;
+            color:#065f46;
+            padding:14px 16px;
+            border-radius:10px;
+            border:1px solid #a7f3d0;
+            font-weight:600;
+            margin-bottom:16px;
+        ">
+            Chamado salvo com sucesso!
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.session_state["chamado_salvo_ok"] = False
 
 with st.form("form_chamado", clear_on_submit=True):
     solicitante = st.text_input("Solicitante")
@@ -34,7 +49,22 @@ with st.form("form_chamado", clear_on_submit=True):
 
 if enviar:
     if not solicitante or not orgao or not descricao:
-        st.error("Preencha pelo menos: Solicitante, Órgão e Descrição.")
+        st.markdown(
+            """
+            <div style="
+                background-color:#fee2e2;
+                color:#991b1b;
+                padding:14px 16px;
+                border-radius:10px;
+                border:1px solid #fecaca;
+                font-weight:600;
+                margin-top:16px;
+            ">
+                Preencha pelo menos: Solicitante, Órgão e Descrição.
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     else:
         nome_anexo = anexo.name if anexo else ""
 
@@ -51,7 +81,22 @@ if enviar:
 
         try:
             salvar_chamado(dados)
-            st.session_state["mostrar_msg_sucesso"] = True
+            st.session_state["chamado_salvo_ok"] = True
             st.rerun()
         except Exception as e:
-            st.error(f"Erro ao salvar o chamado: {e}")
+            st.markdown(
+                f"""
+                <div style="
+                    background-color:#fee2e2;
+                    color:#991b1b;
+                    padding:14px 16px;
+                    border-radius:10px;
+                    border:1px solid #fecaca;
+                    font-weight:600;
+                    margin-top:16px;
+                ">
+                    Erro ao salvar o chamado: {e}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
