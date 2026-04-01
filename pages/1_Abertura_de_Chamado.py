@@ -18,29 +18,12 @@ st.title("Abertura de Chamado")
 st.write("Preencha as informações abaixo para abrir um chamado.")
 st.divider()
 
-# Banner fixo no topo
+# Banner no topo
 if st.session_state.status_banner:
-    cor_fundo = "#d1fae5" if st.session_state.tipo_banner == "sucesso" else "#fee2e2"
-    cor_texto = "#065f46" if st.session_state.tipo_banner == "sucesso" else "#991b1b"
-    cor_borda = "#a7f3d0" if st.session_state.tipo_banner == "sucesso" else "#fecaca"
-
-    st.markdown(
-        f"""
-        <div style="
-            background-color:{cor_fundo};
-            color:{cor_texto};
-            padding:14px 16px;
-            border-radius:10px;
-            border:1px solid {cor_borda};
-            font-weight:600;
-            margin-top:16px;
-            margin-bottom:16px;
-        ">
-            {st.session_state.status_banner}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    if st.session_state.tipo_banner == "sucesso":
+        st.success(st.session_state.status_banner)
+    else:
+        st.error(st.session_state.status_banner)
 
 with st.form("form_chamado", clear_on_submit=False):
     solicitante = st.text_input("Solicitante")
@@ -60,7 +43,7 @@ if enviar:
     if not solicitante or not orgao or not descricao:
         st.session_state.status_banner = "Preencha pelo menos: Solicitante, Órgão e Descrição."
         st.session_state.tipo_banner = "erro"
-        st.rerun()
+        st.stop()
 
     nome_anexo = anexo.name if anexo else ""
 
@@ -84,15 +67,15 @@ if enviar:
             pass
 
         if resultado:
-            st.session_state.status_banner = "✅ Chamado aberto com sucesso!"
+            st.session_state.status_banner = "Chamado aberto com sucesso!"
             st.session_state.tipo_banner = "sucesso"
+            st.success(st.session_state.status_banner)
         else:
             st.session_state.status_banner = "O chamado não foi salvo."
             st.session_state.tipo_banner = "erro"
-
-        st.rerun()
+            st.error(st.session_state.status_banner)
 
     except Exception as e:
         st.session_state.status_banner = f"Erro ao salvar o chamado: {e}"
         st.session_state.tipo_banner = "erro"
-        st.rerun()
+        st.error(st.session_state.status_banner)
