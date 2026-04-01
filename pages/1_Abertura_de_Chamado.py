@@ -1,3 +1,4 @@
+import html
 import streamlit as st
 from data.salvar_chamados import salvar_chamado
 from data.enviar_email import enviar_email_novo_chamado
@@ -8,20 +9,38 @@ st.set_page_config(page_title="Abertura de Chamado", layout="centered")
 aplicar_estilo()
 mostrar_logo()
 
-if "status_banner" not in st.session_state:
-    st.session_state.status_banner = ""
 
-if "tipo_banner" not in st.session_state:
-    st.session_state.tipo_banner = ""
+def set_banner_params(mensagem: str, tipo: str):
+    try:
+        st.query_params["msg"] = mensagem
+        st.query_params["tipo"] = tipo
+    except Exception:
+        st.experimental_set_query_params(msg=mensagem, tipo=tipo)
+
+
+def get_banner_params():
+    try:
+        msg = st.query_params.get("msg", "")
+        tipo = st.query_params.get("tipo", "")
+    except Exception:
+        params = st.experimental_get_query_params()
+        msg = params.get("msg", [""])
+        tipo = params.get("tipo", [""])
+        msg = msg[0] if isinstance(msg, list) else msg
+        tipo = tipo[0] if isinstance(tipo, list) else tipo
+    return msg, tipo
+
 
 st.title("Abertura de Chamado")
 st.write("Preencha as informações abaixo para abrir um chamado.")
 st.divider()
 
-if st.session_state.status_banner:
-    cor_fundo = "#d1fae5" if st.session_state.tipo_banner == "sucesso" else "#fee2e2"
-    cor_texto = "#065f46" if st.session_state.tipo_banner == "sucesso" else "#991b1b"
-    cor_borda = "#a7f3d0" if st.session_state.tipo_banner == "sucesso" else "#fecaca"
+msg, tipo = get_banner_params()
+
+if msg:
+    cor_fundo = "#d1fae5" if tipo == "sucesso" else "#fee2e2"
+    cor_texto = "#065f46" if tipo == "sucesso" else "#991b1b"
+    cor_borda = "#a7f3d0" if tipo == "sucesso" else "#fecaca"
 
     st.markdown(
         f"""
@@ -35,7 +54,7 @@ if st.session_state.status_banner:
             margin-top:16px;
             margin-bottom:16px;
         ">
-            {st.session_state.status_banner}
+            {html.escape(msg)}
         </div>
         """,
         unsafe_allow_html=True
@@ -57,8 +76,10 @@ with st.form("form_chamado", clear_on_submit=False):
 
 if enviar:
     if not solicitante or not orgao or not descricao:
-        st.session_state.status_banner = "Preencha pelo menos: Solicitante, Órgão e Descrição."
-        st.session_state.tipo_banner = "erro"
+        set_banner_params(
+            "Preencha pelo menos: Solicitante, Órgão e Descrição.",
+            "erro"
+        )
         st.rerun()
 
     nome_anexo = anexo.name if anexo else ""
@@ -83,15 +104,12 @@ if enviar:
             pass
 
         if resultado:
-            st.session_state.status_banner = "✅ Chamado aberto com sucesso!"
-            st.session_state.tipo_banner = "sucesso"
+            set_banner_params("Chamado aberto com sucesso!", "sucesso")
         else:
-            st.session_state.status_banner = "O chamado não foi salvo."
-            st.session_state.tipo_banner = "erro"
+            set_banner_params("O chamado não foi salvo.", "erro")
 
         st.rerun()
 
     except Exception as e:
-        st.session_state.status_banner = f"Erro ao salvar o chamado: {e}"
-        st.session_state.tipo_banner = "erro"
+        set_banner_params(f"Erro ao salvar o chamado: {e}", "erro")
         st.rerun()
