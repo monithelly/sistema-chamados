@@ -75,6 +75,8 @@ if st.session_state.mensagem:
         st.success(st.session_state.mensagem)
     else:
         st.error(st.session_state.mensagem)
-    # Limpa após exibir para não ficar preso na tela
+    
+    # ✅ Aguarda o usuário ver a mensagem, limpa só no próximo clique
     st.session_state.mensagem = None
     st.session_state.mensagem_tipo = None
+    st.rerun()  # 👈 ESSA É A MUDANÇA
