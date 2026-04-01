@@ -12,42 +12,8 @@ st.title("Abertura de Chamado")
 st.write("Preencha as informações abaixo para abrir um chamado.")
 st.divider()
 
-# Estado da mensagem
-if "status_banner" not in st.session_state:
-    st.session_state.status_banner = ""
-
-if "tipo_banner" not in st.session_state:
-    st.session_state.tipo_banner = ""
-
-# Placeholder FIXO no topo
-banner_placeholder = st.empty()
-
-def renderizar_banner():
-    if st.session_state.status_banner:
-        cor_fundo = "#d1fae5" if st.session_state.tipo_banner == "sucesso" else "#fee2e2"
-        cor_texto = "#065f46" if st.session_state.tipo_banner == "sucesso" else "#991b1b"
-        cor_borda = "#a7f3d0" if st.session_state.tipo_banner == "sucesso" else "#fecaca"
-
-        banner_placeholder.markdown(
-            f"""
-            <div style="
-                background-color:{cor_fundo};
-                color:{cor_texto};
-                padding:14px 16px;
-                border-radius:10px;
-                border:1px solid {cor_borda};
-                font-weight:600;
-                margin-top:16px;
-                margin-bottom:16px;
-            ">
-                {st.session_state.status_banner}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-# Renderiza a mensagem já salva, se existir
-renderizar_banner()
+# Placeholder fixo no topo para a mensagem
+banner = st.empty()
 
 with st.form("form_chamado", clear_on_submit=False):
     solicitante = st.text_input("Solicitante")
@@ -65,9 +31,7 @@ with st.form("form_chamado", clear_on_submit=False):
 
 if enviar:
     if not solicitante or not orgao or not descricao:
-        st.session_state.status_banner = "Preencha pelo menos: Solicitante, Órgão e Descrição."
-        st.session_state.tipo_banner = "erro"
-        renderizar_banner()
+        banner.error("Preencha pelo menos: Solicitante, Órgão e Descrição.")
         st.stop()
 
     nome_anexo = anexo.name if anexo else ""
@@ -92,15 +56,12 @@ if enviar:
             pass
 
         if resultado:
-            st.session_state.status_banner = "✅ Chamado aberto com sucesso!"
-            st.session_state.tipo_banner = "sucesso"
+            banner.success("Chamado aberto com sucesso!")
+            st.toast("Chamado aberto com sucesso!")
         else:
-            st.session_state.status_banner = "O chamado não foi salvo."
-            st.session_state.tipo_banner = "erro"
-
-        renderizar_banner()
+            banner.error("O chamado não foi salvo.")
+            st.toast("O chamado não foi salvo.")
 
     except Exception as e:
-        st.session_state.status_banner = f"Erro ao salvar o chamado: {e}"
-        st.session_state.tipo_banner = "erro"
-        renderizar_banner()
+        banner.error(f"Erro ao salvar o chamado: {e}")
+        st.toast(f"Erro ao salvar o chamado: {e}")
