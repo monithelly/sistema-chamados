@@ -3,5 +3,5 @@ pandas
 plotly
 openpyxl
 gspread
+google-auth
 yagmail
-gspread
