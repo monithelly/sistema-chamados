@@ -55,4 +55,6 @@ if enviar:
                 st.session_state.sucesso = True
                 st.rerun()
         except Exception as e:
+            import traceback
             st.error(f"Erro ao salvar o chamado: {e}")
+            st.code(traceback.format_exc())
