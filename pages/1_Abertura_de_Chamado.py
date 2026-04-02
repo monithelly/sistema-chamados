@@ -23,7 +23,7 @@ with st.form("form_chamado", clear_on_submit=True):
     url = st.text_input("URL")
     link_gravacao = st.text_input("Link da gravação")
     descricao = st.text_area("Descrição")
-    anexo = st.file_uploader("Anexo (opcional)")
+    anexo = st.text_input("Link do anexo (opcional)")
     enviar = st.form_submit_button("Abrir chamado")
 
 if st.session_state.sucesso:
@@ -42,9 +42,10 @@ if enviar:
             "url": url,
             "link_gravacao": link_gravacao,
             "descricao": descricao,
+            "anexo": anexo
         }
         try:
-            resultado = salvar_chamado(dados, arquivo=anexo)
+            resultado = salvar_chamado(dados)
             try:
                 enviar_email_novo_chamado(dados)
             except Exception:

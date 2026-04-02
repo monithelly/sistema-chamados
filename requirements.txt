@@ -4,5 +4,4 @@ plotly
 openpyxl
 gspread
 google-auth
-google-api-python-client
 yagmail
