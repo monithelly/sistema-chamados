@@ -18,16 +18,20 @@ Solicitante: {dados_chamado.get("solicitante", "")}
 Login: {dados_chamado.get("login", "")}
 Órgão: {dados_chamado.get("orgao", "")}
 URL: {dados_chamado.get("url", "")}
-
-Descrição:
-{dados_chamado.get("descricao", "")}
-
+Descrição: {dados_chamado.get("descricao", "")}
 Categoria: {dados_chamado.get("categoria", "")}
 Link gravação: {link_gravacao}
 """
 
+    destinatarios = [
+    "monithelly.flavia@govplan.com.br",
+    "franciele@govplan.com.br",
+]
+
     yag.send(
-        to="monithelly.flavia@govplan.com.br",
+        to=destinatarios,
         subject="Nova abertura de chamado",
         contents=corpo
     )
+
+    print("E-mail enviado para:", destinatarios)

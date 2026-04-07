@@ -2,25 +2,22 @@ import streamlit as st
 import gspread
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from google.oauth2.service_account import Credentials
-
-SCOPES = [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive"
-]
 
 SPREADSHEET_ID = "1huNRk11OX11ae-lv4NQX-OED3qgTzVHSTxTVV_dPI9o"
 
+
 def get_sheet():
-    creds = Credentials.from_service_account_info(
-        st.secrets["gcp_service_account"],
-        scopes=SCOPES
-    )
-    client = gspread.authorize(creds)
+    if "gcp_service_account" not in st.secrets:
+        raise KeyError("A chave 'gcp_service_account' não foi encontrada no secrets.toml")
+
+    creds_info = dict(st.secrets["gcp_service_account"])
+    client = gspread.service_account_from_dict(creds_info)
     return client.open_by_key(SPREADSHEET_ID).sheet1
+
 
 def salvar_chamado(dados):
     agora_brasil = datetime.now(ZoneInfo("America/Sao_Paulo"))
+
     nova_linha = [
         agora_brasil.strftime("%d/%m/%Y %H:%M:%S"),
         dados.get("solicitante", ""),
@@ -36,6 +33,8 @@ def salvar_chamado(dados):
         "",
         ""
     ]
+
     sheet = get_sheet()
     sheet.append_row(nova_linha)
+
     return True

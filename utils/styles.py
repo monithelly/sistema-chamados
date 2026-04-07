@@ -11,8 +11,11 @@ def aplicar_estilo():
 
     /* Container principal */
     .block-container {
-        padding-top: 2rem;
+        padding-top: 1.5rem;
         padding-bottom: 2rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        max-width: 100% !important;
     }
 
     /* Sidebar */
@@ -48,12 +51,12 @@ def aplicar_estilo():
         color: #132A63 !important;
     }
 
-    /* Texto geral - sem afetar todos os divs */
+    /* Texto geral */
     p, label, span {
         color: #132A63 !important;
     }
 
-    /* Botões normais e de formulário */
+    /* Botões */
     .stButton > button,
     .stForm button[kind="primary"] {
         background-color: #7EDC12 !important;
@@ -84,6 +87,19 @@ def aplicar_estilo():
         border: 1px solid #D9E2F1 !important;
         background-color: white !important;
         color: #132A63 !important;
+    }
+
+    /* Date input */
+    .stDateInput input {
+        border-radius: 10px !important;
+        border: 1px solid #D9E2F1 !important;
+        background-color: white !important;
+        color: #132A63 !important;
+    }
+
+    /* Dataframe */
+    [data-testid="stDataFrame"] {
+        width: 100% !important;
     }
 
     /* File uploader */

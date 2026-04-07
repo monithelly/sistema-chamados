@@ -44,14 +44,19 @@ if enviar:
             "descricao": descricao,
             "anexo": anexo
         }
+
         try:
             resultado = salvar_chamado(dados)
+
             try:
                 enviar_email_novo_chamado(dados)
-            except Exception:
-                pass
+            except Exception as e:
+                st.warning(f"O chamado foi salvo, mas o e-mail falhou: {e}")
+
             if resultado:
                 st.session_state.sucesso = True
                 st.rerun()
+
         except Exception as e:
             st.error(f"Erro ao salvar o chamado: {e}")
+            st.exception(e)

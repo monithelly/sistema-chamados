@@ -1,4 +1,6 @@
 import streamlit as st
+st.set_page_config(layout="wide")
+
 import pandas as pd
 from utils.styles import aplicar_estilo, mostrar_logo
 from data.ler_chamados import ler_chamados
@@ -15,14 +17,14 @@ df = ler_chamados()
 if df.empty:
     st.info("Nenhum chamado encontrado.")
 else:
-    if "data_abertura" in df.columns:
-        df["data_abertura"] = pd.to_datetime(df["data_abertura"], errors="coerce", dayfirst=True)
+    col1, col2, col3, col4, col5 = st.columns([2, 2, 1.5, 1.3, 1.3])
 
-    col1, col2, col3 = st.columns(3)
     with col1:
         nome = st.text_input("Solicitante")
+
     with col2:
         numero = st.text_input("Nº do chamado")
+
     with col3:
         status = st.selectbox(
             "Status",
@@ -30,37 +32,72 @@ else:
             if "status" in df.columns else ["Todos"]
         )
 
-    col4, col5 = st.columns(2)
     with col4:
         data_inicio = st.date_input("Data inicial", value=None)
+
     with col5:
         data_fim = st.date_input("Data final", value=None)
 
     resultado = df.copy()
-    if nome:
-        resultado = resultado[resultado["solicitante"].astype(str).str.contains(nome, case=False, na=False)]
-    if numero:
-        resultado = resultado[resultado["numero_chamado_externo"].astype(str).str.contains(numero, case=False, na=False)]
-    if status != "Todos":
-        resultado = resultado[resultado["status"].astype(str) == status]
+
+    if nome and "solicitante" in resultado.columns:
+        resultado = resultado[
+            resultado["solicitante"].astype(str).str.contains(nome, case=False, na=False)
+        ]
+
+    if numero and "numero_chamado_externo" in resultado.columns:
+        resultado = resultado[
+            resultado["numero_chamado_externo"].astype(str).str.contains(numero, case=False, na=False)
+        ]
+
+    if status != "Todos" and "status" in resultado.columns:
+        resultado = resultado[
+            resultado["status"].astype(str) == status
+        ]
+
     if data_inicio and "data_abertura" in resultado.columns:
-        resultado = resultado[resultado["data_abertura"].dt.date >= data_inicio]
+        resultado = resultado[
+            resultado["data_abertura"].notna() &
+            (resultado["data_abertura"].dt.date >= data_inicio)
+        ]
+
     if data_fim and "data_abertura" in resultado.columns:
-        resultado = resultado[resultado["data_abertura"].dt.date <= data_fim]
+        resultado = resultado[
+            resultado["data_abertura"].notna() &
+            (resultado["data_abertura"].dt.date <= data_fim)
+        ]
+
+    # sempre mais novos primeiro
+    if "data_abertura" in resultado.columns:
+        resultado = resultado.sort_values(
+            by="data_abertura",
+            ascending=False,
+            na_position="last"
+        ).reset_index(drop=True)
 
     if resultado.empty:
         st.info("Nenhum chamado encontrado com esses filtros.")
     else:
         st.success(f"{len(resultado)} chamado(s) encontrado(s)")
-        if "data_abertura" in resultado.columns:
-            resultado["Data"] = resultado["data_abertura"].dt.strftime("%d/%m/%Y")
+
         resultado = resultado.rename(columns={
-            "solicitante": "Solicitante", "categoria": "Categoria",
-            "status": "Status", "numero_chamado_externo": "Nº Chamado",
-            "orgao": "Órgão", "login": "Login", "url": "URL",
-            "link_gravacao": "Gravação", "descricao": "Descrição", "anexo": "Anexo"
+            "data_abertura": "Data",
+            "solicitante": "Solicitante",
+            "categoria": "Categoria",
+            "status": "Status",
+            "numero_chamado_externo": "Nº Chamado",
+            "orgao": "Órgão",
+            "login": "Login",
+            "url": "URL",
+            "link_gravacao": "Gravação",
+            "descricao": "Descrição",
+            "anexo": "Anexo"
         })
-        colunas = ["Data", "Solicitante", "Categoria", "Status", "Nº Chamado", "Órgão", "Descrição", "Login", "URL", "Gravação"]
+
+        colunas = [
+            "Data", "Solicitante", "Categoria", "Status",
+            "Nº Chamado", "Órgão", "Descrição", "Login", "URL", "Gravação"
+        ]
         colunas = [c for c in colunas if c in resultado.columns]
         resultado = resultado[colunas].copy()
 
@@ -74,5 +111,21 @@ else:
                 return "background-color: #FFF4CC; color: #8A6D00; font-weight: bold;"
             return ""
 
+        # Coluna auxiliar de ordenação (não exibida)
+        resultado.insert(0, "_ordem", range(len(resultado)))
+
         styled_df = resultado.style.map(cor_status, subset=["Status"])
-        st.dataframe(styled_df, use_container_width=True, hide_index=True)
+
+        st.dataframe(
+            styled_df,
+            use_container_width=True,
+            hide_index=True,
+            height=800,
+            column_config={
+                "_ordem": None,  # esconde a coluna auxiliar
+                "Data": st.column_config.DateColumn(
+                    "Data",
+                    format="DD/MM/YYYY",
+                )
+            }
+        )
