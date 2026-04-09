@@ -29,12 +29,14 @@ def ler_chamados():
 def atualizar_chamado(indice_linha, status, numero, observacao, data_fechamento):
     sheet = get_sheet()
     linha = indice_linha + 2
+
     colunas = {
-        "status": 10,
-        "numero_chamado_externo": 11,
-        "observacao_interna": 12,
-        "data_fechamento": 13
+        "status": 11,
+        "numero_chamado_externo": 12,
+        "observacao_interna": 13,
+        "data_fechamento": 14
     }
+
     sheet.update_cell(linha, colunas["status"], status)
     sheet.update_cell(linha, colunas["numero_chamado_externo"], numero)
     sheet.update_cell(linha, colunas["observacao_interna"], observacao)

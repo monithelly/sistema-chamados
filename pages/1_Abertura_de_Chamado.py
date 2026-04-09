@@ -22,6 +22,24 @@ with st.form("form_chamado", clear_on_submit=True):
     login = st.text_input("Login")
     url = st.text_input("URL")
     link_gravacao = st.text_input("Link da gravação")
+
+    criticidade = st.selectbox(
+        "Criticidade",
+        [
+            "4 - Baixo",
+            "3 - Médio",
+            "2 - Alto",
+            "1 - Crítico"
+        ],
+        help=(
+            "Classifique o impacto do incidente: "
+            "1-Crítico = sistema indisponível ou falha grave; "
+            "2-Alto = funcionalidade essencial afetada; "
+            "3-Médio = impacto parcial; "
+            "4-Baixo = dúvidas, ajustes ou melhorias."
+        )
+    )
+
     descricao = st.text_area("Descrição")
     anexo = st.file_uploader("Anexar imagem (opcional)", type=["png", "jpg", "jpeg"])
     enviar = st.form_submit_button("Abrir chamado")
@@ -41,6 +59,7 @@ if enviar:
             "login": login,
             "url": url,
             "link_gravacao": link_gravacao,
+            "criticidade": criticidade,
             "descricao": descricao,
             "anexo": anexo
         }

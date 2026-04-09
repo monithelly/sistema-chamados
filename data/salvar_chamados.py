@@ -44,7 +44,7 @@ def salvar_chamado(dados):
     caminho_anexo = salvar_anexo(dados.get("anexo"))
 
     nova_linha = [
-        agora_brasil.strftime("%d/%m/%Y %H:%M:%S"),
+        agora_brasil.strftime("%d/%m/%Y %H:%M:%S"),  # data_hora
         dados.get("solicitante", ""),
         dados.get("categoria", ""),
         dados.get("orgao", ""),
@@ -53,7 +53,8 @@ def salvar_chamado(dados):
         dados.get("link_gravacao", ""),
         dados.get("descricao", ""),
         caminho_anexo,
-        "Aguardando abertura",
+        dados.get("criticidade", ""),   # nova coluna
+        "Aguardando abertura",          # status
         "",
         "",
         ""
