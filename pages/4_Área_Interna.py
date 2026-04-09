@@ -121,11 +121,9 @@ else:
                 )
             )
 
-            # Controle do chamado atualmente selecionado
             if "indice_chamado_atual" not in st.session_state:
                 st.session_state["indice_chamado_atual"] = None
 
-            # Sempre que trocar o chamado, reseta os campos da área de atualização
             if st.session_state["indice_chamado_atual"] != indice:
                 st.session_state["indice_chamado_atual"] = indice
                 limpar_campos_atualizacao(
@@ -201,12 +199,4 @@ else:
                 )
 
                 st.success("Chamado atualizado com sucesso!")
-
-                # Depois de salvar, recarrega os campos com o que acabou de ser salvo
-                limpar_campos_atualizacao(
-                    status_atual=st.session_state["novo_status"],
-                    numero_chamado=st.session_state["numero_chamado"],
-                    observacao=st.session_state["observacao_interna"]
-                )
-
                 st.rerun()
