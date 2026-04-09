@@ -23,7 +23,7 @@ with st.form("form_chamado", clear_on_submit=True):
     url = st.text_input("URL")
     link_gravacao = st.text_input("Link da gravação")
     descricao = st.text_area("Descrição")
-    anexo = st.text_input("Link do anexo (opcional)")
+    anexo = st.file_uploader("Anexar imagem (opcional)", type=["png", "jpg", "jpeg"])
     enviar = st.form_submit_button("Abrir chamado")
 
 if st.session_state.sucesso:

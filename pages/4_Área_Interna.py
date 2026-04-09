@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -56,6 +57,7 @@ else:
         df["descricao"] = df["descricao"].fillna("").astype(str).str.strip()
         df["numero_chamado_externo"] = df["numero_chamado_externo"].fillna("").astype(str).str.strip()
         df["observacao_interna"] = df["observacao_interna"].fillna("").astype(str).str.strip()
+        df["anexo"] = df["anexo"].fillna("").astype(str).str.strip()
 
         df.loc[df["status"] == "", "status"] = "Aguardando abertura"
 
@@ -162,6 +164,20 @@ else:
                 if resultado.loc[indice, "descricao"]
                 else "Sem descrição"
             )
+
+            st.write("**Anexo:**")
+            caminho_anexo = resultado.loc[indice, "anexo"]
+
+            if caminho_anexo:
+                if os.path.exists(caminho_anexo):
+                    try:
+                        st.image(caminho_anexo, caption="Imagem anexada", use_container_width=True)
+                    except Exception as e:
+                        st.warning(f"Não foi possível carregar a imagem: {e}")
+                else:
+                    st.warning(f"Arquivo de anexo não encontrado: {caminho_anexo}")
+            else:
+                st.info("Sem anexo")
 
             st.divider()
             st.subheader("Atualização")

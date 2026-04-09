@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import gspread
 from datetime import datetime
@@ -15,8 +16,32 @@ def get_sheet():
     return client.open_by_key(SPREADSHEET_ID).sheet1
 
 
+def salvar_anexo(arquivo):
+    if arquivo is None:
+        return ""
+
+    pasta_uploads = "uploads"
+    os.makedirs(pasta_uploads, exist_ok=True)
+
+    agora_brasil = datetime.now(ZoneInfo("America/Sao_Paulo"))
+    timestamp = agora_brasil.strftime("%Y%m%d_%H%M%S")
+
+    nome_original = arquivo.name
+    nome_limpo = nome_original.replace(" ", "_")
+    nome_arquivo = f"{timestamp}_{nome_limpo}"
+
+    caminho_arquivo = os.path.join(pasta_uploads, nome_arquivo)
+
+    with open(caminho_arquivo, "wb") as f:
+        f.write(arquivo.getbuffer())
+
+    return caminho_arquivo
+
+
 def salvar_chamado(dados):
     agora_brasil = datetime.now(ZoneInfo("America/Sao_Paulo"))
+
+    caminho_anexo = salvar_anexo(dados.get("anexo"))
 
     nova_linha = [
         agora_brasil.strftime("%d/%m/%Y %H:%M:%S"),
@@ -27,7 +52,7 @@ def salvar_chamado(dados):
         dados.get("url", ""),
         dados.get("link_gravacao", ""),
         dados.get("descricao", ""),
-        dados.get("anexo", ""),
+        caminho_anexo,
         "Aguardando abertura",
         "",
         "",
